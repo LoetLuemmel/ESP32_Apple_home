@@ -1,6 +1,6 @@
 # Projekt Status: ESP32-C3 Matter Light
 
-**Letzte Aktualisierung**: 2025-11-29
+**Letzte Aktualisierung**: 2025-11-29 (CLAUDE.md hinzugefügt)
 **Claude Code Session Status**
 
 ---
@@ -154,6 +154,7 @@ cd /Users/pitforster/Documents/Dev/Claude_Test/esp32_matter_light
 | `README.md` | Hauptdokumentation | ✅ Erstellt |
 | `QUICKSTART.md` | Schnellstart-Guide | ✅ Erstellt |
 | `STRUCTURE.md` | Architektur-Doku | ✅ Erstellt |
+| `CLAUDE.md` | Claude Code Guidance | ✅ Erstellt |
 | `.gitignore` | Git-Konfiguration | ✅ Erstellt |
 | `PROJECT_STATUS.md` | Diese Status-Datei | ✅ Erstellt |
 

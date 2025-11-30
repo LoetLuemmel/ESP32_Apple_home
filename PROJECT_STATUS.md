@@ -1,6 +1,6 @@
-# Projekt Status: ESP32-C3 Matter Light
+# Projekt Status: ESP32 Matter Light
 
-**Letzte Aktualisierung**: 2025-11-29 (CLAUDE.md hinzugefügt)
+**Letzte Aktualisierung**: 2025-11-30 (Erfolgreich auf ESP32 portiert und mit Apple Home gepairt)
 **Claude Code Session Status**
 
 ---
@@ -40,10 +40,11 @@
 ## 📋 Projekt-Details
 
 ### Hardware
-- **Microcontroller**: ESP32-C3
-- **LED GPIO**: GPIO 8 (Standard für ESP32-C3 DevKits)
+- **Microcontroller**: ESP32-D0WD-V3 (Dual Core Xtensa, 240 MHz)
+- **LED GPIO**: Automatisch konfiguriert durch ESP-Matter SDK
 - **Flash Größe**: 4 MB
-- **RAM**: 400 KB
+- **RAM**: 520 KB
+- **MAC-Adresse**: d4:8c:49:e4:66:cc
 
 ### Software Stack
 - **Framework**: ESP-IDF v5.1.2
@@ -195,17 +196,41 @@ cd /Users/pitforster/Documents/Dev/Claude_Test/esp32_matter_light
 
 ## 🎯 Projektziel: ERREICHT ✅
 
-**Ziel**: ESP32-C3 App erstellen, die über Matter/WLAN mit Apple Home verbunden werden kann und die eingebaute LED steuert.
+**Ziel**: ESP32 App erstellen, die über Matter/WLAN mit Apple Home verbunden werden kann und die eingebaute LED steuert.
 
-**Status**: ✅ Vollständig implementiert
+**Status**: ✅ Vollständig implementiert und deployed
 
 **Ergebnis**:
-- Funktionsfähige Matter-App für ESP32-C3
-- Apple Home Integration
-- LED-Steuerung über Home App & Siri
-- Vollständige Dokumentation
-- Build-Automatisierung
-- Bereit zum Flashen und Testen
+- ✅ Funktionsfähige Matter-App für ESP32 (Dual Core)
+- ✅ Erfolgreich mit Apple Home gepairt
+- ✅ LED-Steuerung über Home App & Siri funktioniert
+- ✅ On/Off Light (Device Type 0x0100)
+- ✅ Vollständige Dokumentation
+- ✅ Build-Automatisierung
+- ✅ Erfolgreich auf Hardware getestet
+
+---
+
+## 📱 Deployment Status (2025-11-30)
+
+### ✅ Erfolgreiches Apple Home Pairing
+- **Gerät**: ESP32-D0WD-V3 (MAC: d4:8c:49:e4:66:cc)
+- **Device Type**: On/Off Light
+- **Pairing-Methode**: BLE Commissioning mit Manual Pairing Code
+- **WiFi-Netzwerk**: "Tinkywinki"
+- **Status**: Voll funktionsfähig in Apple Home integriert
+
+### Commissioning Details
+- **Manual Pairing Code**: 34970112332
+- **QR Code**: MT:Y.K9042C00KA0648G00
+- **Commissioning Window**: 300 Sekunden (5 Minuten)
+- **Verbindung**: WiFi over Matter (nach BLE Commissioning)
+
+### Testing
+- ✅ Ein/Aus Steuerung via Home App
+- ✅ Siri Sprachsteuerung
+- ✅ LED schaltet korrekt
+- ✅ Matter-Protokoll funktioniert stabil
 
 ---
 

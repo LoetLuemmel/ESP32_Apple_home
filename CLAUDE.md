@@ -4,7 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an ESP32-C3 Matter Light implementation that enables control of an onboard LED through Apple Home via the Matter protocol over WiFi. The device acts as an On/Off Light (Matter Device Type 0x0100) using BLE for commissioning.
+This is an ESP32 Matter Light implementation that enables control of an onboard LED through Apple Home via the Matter protocol over WiFi. The device acts as an On/Off Light (Matter Device Type 0x0100) using BLE for commissioning.
+
+**Hardware**: ESP32-D0WD-V3 (Dual Core Xtensa @ 240MHz)
+**Status**: ✅ Successfully deployed and paired with Apple Home (2025-11-30)
 
 ## Build System & Environment
 
@@ -26,7 +29,7 @@ source ~/esp/esp-matter/export.sh
 
 ```bash
 # Set target (first time only)
-idf.py set-target esp32c3
+idf.py set-target esp32
 
 # Build project
 idf.py build
@@ -95,17 +98,22 @@ Matter Node (root)
 
 ### Key Constants
 
-- **LED GPIO**: `GPIO_NUM_8` (defined in `main/app_main.cpp:27`)
-  - Common for ESP32-C3-DevKitM-1
-  - May need adjustment for different boards (GPIO 2, 18, or 19)
+- **LED GPIO**: Automatically configured by ESP-Matter SDK based on target chip
+  - ESP32: Typically GPIO 2 (on-board LED)
+  - ESP32-C3: Typically GPIO 8
+  - Configured in ESP-Matter device HAL (Hardware Abstraction Layer)
 
 - **Matter Clusters**:
   - OnOff Cluster ID: `0x0006`
   - OnOff Attribute ID: `0x0000`
 
+- **Device Type**: On/Off Light (0x0100)
+  - Simple on/off control without dimming or color
+  - Changed from Extended Color Light to reduce complexity
+
 ## Configuration Files
 
-- **`sdkconfig.defaults`**: ESP32-C3 specific config (Bluetooth, WiFi, partitions)
+- **`sdkconfig.defaults`**: Generic config supporting multiple ESP32 variants (Bluetooth, WiFi, partitions)
 - **`partitions.csv`**: Flash layout with dual-OTA support
   - nvs: 24KB (credentials storage)
   - app0/app1: 1.5MB each (dual OTA partitions)
@@ -169,3 +177,36 @@ Change from `on_off_light::create()` to `dimmable_light::create()` and implement
 - ESP-IDF v5.1.2 Documentation: https://docs.espressif.com/projects/esp-idf/
 - ESP-Matter SDK: https://github.com/espressif/esp-matter
 - Matter Specification: https://csa-iot.org/all-solutions/matter/
+
+---
+
+## Deployment Information (2025-11-30)
+
+### Successfully Deployed to Apple Home
+
+**Hardware:**
+- ESP32-D0WD-V3 (Dual Core, 240MHz)
+- MAC: d4:8c:49:e4:66:cc
+- Port: /dev/cu.usbserial-110
+
+**Pairing Details:**
+- Manual Pairing Code: `34970112332`
+- QR Code: `MT:Y.K9042C00KA0648G00`
+- Commissioning: BLE → WiFi
+- Network: "Tinkywinki"
+
+**Status:** ✅ Fully operational in Apple Home
+- Device appears as On/Off Light
+- Controllable via Home App and Siri
+- LED switches correctly on command
+- Matter protocol working stably
+
+### Factory Reset (if needed)
+
+To completely reset the device (clear all pairing data):
+```bash
+idf.py erase-flash
+idf.py -p /dev/cu.usbserial-110 flash
+```
+
+This is required when switching between Extended Color Light and On/Off Light or when re-pairing to a different Home.

@@ -149,14 +149,25 @@ After flashing, the device automatically opens a commissioning window. The seria
 
 ```
 I CHIP: [SVR] Manual pairing code: 34970112332
+I CHIP: [SVR] QR Code: MT:Y.K9042C00KA0648G00
 ```
 
-This 11-digit code is used in the Home App to pair the device. The commissioning flow:
-1. BLE discovery and connection
-2. Passcode verification
-3. WiFi credential provisioning
-4. Matter operational certificate exchange
-5. Device control via WiFi
+**Recommended: Use the 11-digit Manual Pairing Code** (`34970112332`)
+
+The commissioning flow:
+1. Home App → **+** → **Add Accessory** → **More Options**
+2. Select the ESP32 device
+3. Enter manual code: `34970112332`
+4. BLE discovery and connection
+5. Passcode verification
+6. WiFi credential provisioning
+7. Matter operational certificate exchange
+8. Device control via WiFi
+
+**Note on QR Code**:
+- The QR code may not work reliably with non-certified Matter development boards
+- Apple Home's QR scanner has strict requirements for certified devices
+- The manual pairing code is the recommended method for development/testing
 
 ## Common Modifications
 

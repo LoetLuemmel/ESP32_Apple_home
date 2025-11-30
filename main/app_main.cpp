@@ -9,6 +9,8 @@
 #include <esp_err.h>
 #include <esp_log.h>
 #include <nvs_flash.h>
+#include <driver/gpio.h>
+#include <inttypes.h>
 
 #include <esp_matter.h>
 #include <esp_matter_console.h>
@@ -158,6 +160,15 @@ static esp_err_t app_attribute_update_cb(attribute::callback_type_t type, uint16
 {
     esp_err_t err = ESP_OK;
 
+    ESP_LOGI(TAG, "========================================");
+    ESP_LOGI(TAG, "ATTRIBUTE UPDATE CALLBACK!");
+    ESP_LOGI(TAG, "Endpoint: %d, Cluster: 0x%08" PRIX32 ", Attribute: 0x%08" PRIX32, endpoint_id, cluster_id, attribute_id);
+    ESP_LOGI(TAG, "Type: %s", type == PRE_UPDATE ? "PRE_UPDATE" : "POST_UPDATE");
+    if (val) {
+        ESP_LOGI(TAG, "Value type: %d", val->type);
+    }
+    ESP_LOGI(TAG, "========================================");
+
     if (type == PRE_UPDATE) {
         /* Driver update */
         app_driver_handle_t driver_handle = (app_driver_handle_t)priv_data;
@@ -239,6 +250,23 @@ extern "C" void app_main()
 
     /* Starting driver with default values */
     app_driver_light_set_defaults(light_endpoint_id);
+
+    /* GPIO 2 Blink Test - 5 times to verify LED is working */
+    ESP_LOGI(TAG, "==============================================");
+    ESP_LOGI(TAG, "GPIO 2 BLINK TEST - Watch the onboard LED!");
+    ESP_LOGI(TAG, "==============================================");
+    gpio_set_direction(GPIO_NUM_2, GPIO_MODE_OUTPUT);
+    for (int i = 0; i < 5; i++) {
+        ESP_LOGI(TAG, "Blink %d/5: LED ON (GPIO 2 = LOW)", i + 1);
+        gpio_set_level(GPIO_NUM_2, 0);  // LOW = LED ON for ESP32 DevKit
+        vTaskDelay(pdMS_TO_TICKS(500));
+
+        ESP_LOGI(TAG, "Blink %d/5: LED OFF (GPIO 2 = HIGH)", i + 1);
+        gpio_set_level(GPIO_NUM_2, 1);  // HIGH = LED OFF
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+    ESP_LOGI(TAG, "GPIO 2 Blink Test Complete!");
+    ESP_LOGI(TAG, "==============================================");
 
 #if CONFIG_ENABLE_ENCRYPTED_OTA
     err = esp_matter_ota_requestor_encrypted_init(s_decryption_key, s_decryption_key_len);

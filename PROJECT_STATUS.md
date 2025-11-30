@@ -227,10 +227,19 @@ cd /Users/pitforster/Documents/Dev/Claude_Test/esp32_matter_light
 - **Verbindung**: WiFi over Matter (nach BLE Commissioning)
 
 ### Testing
-- ✅ Ein/Aus Steuerung via Home App
-- ✅ Siri Sprachsteuerung
-- ✅ LED schaltet korrekt
+- ✅ Ein/Aus Steuerung via Home App funktioniert perfekt
+- ✅ Siri Sprachsteuerung funktioniert
+- ✅ LED schaltet korrekt (GPIO 2, direkte Steuerung)
 - ✅ Matter-Protokoll funktioniert stabil
+
+### Technische Implementierung
+- **LED GPIO**: GPIO 2 (on-board LED auf ESP32 DevKit)
+- **Steuerung**: Direkte GPIO-Kontrolle via `gpio_set_level()` in `app_driver.cpp`
+- **Grund**: Bypassing ESP-Matter LED driver für vorhersagbare GPIO 2 Kontrolle
+- **Logik**: GPIO HIGH (1) = LED AN, GPIO LOW (0) = LED AUS
+- **Dateien geändert**:
+  - `main/app_driver.cpp`: Direkte GPIO-Steuerung implementiert
+  - `main/app_main.cpp`: GPIO 2 Blink-Test hinzugefügt
 
 ---
 

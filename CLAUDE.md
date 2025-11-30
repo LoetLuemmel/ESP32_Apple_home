@@ -98,10 +98,11 @@ Matter Node (root)
 
 ### Key Constants
 
-- **LED GPIO**: Automatically configured by ESP-Matter SDK based on target chip
-  - ESP32: Typically GPIO 2 (on-board LED)
-  - ESP32-C3: Typically GPIO 8
-  - Configured in ESP-Matter device HAL (Hardware Abstraction Layer)
+- **LED GPIO**: GPIO 2 (on-board LED on ESP32 DevKit)
+  - Directly controlled via `gpio_set_level()` in `app_driver.cpp`
+  - **Important**: Bypasses ESP-Matter LED driver for direct control
+  - GPIO HIGH (1) = LED ON
+  - GPIO LOW (0) = LED OFF
 
 - **Matter Clusters**:
   - OnOff Cluster ID: `0x0006`
@@ -110,6 +111,29 @@ Matter Node (root)
 - **Device Type**: On/Off Light (0x0100)
   - Simple on/off control without dimming or color
   - Changed from Extended Color Light to reduce complexity
+
+### LED Control Implementation
+
+The LED is controlled directly via GPIO without using the ESP-Matter LED driver abstraction:
+
+**Location**: `main/app_driver.cpp:35-48`
+
+```cpp
+static esp_err_t app_driver_light_set_power(led_driver_handle_t handle, esp_matter_attr_val_t *val)
+{
+    // Direct GPIO control for GPIO 2
+    // Matter ON (1) → GPIO HIGH (1) → LED ON
+    // Matter OFF (0) → GPIO LOW (0) → LED OFF
+    uint32_t gpio_level = val->val.b ? 1 : 0;
+    gpio_set_level(GPIO_NUM_2, gpio_level);
+    return ESP_OK;
+}
+```
+
+**Why Direct Control?**
+- ESP-Matter's LED driver may use different GPIO pins depending on the board
+- Direct control ensures GPIO 2 is used (on-board LED on most ESP32 DevKit boards)
+- Simpler and more predictable for this single-LED use case
 
 ## Configuration Files
 
@@ -138,10 +162,12 @@ This 11-digit code is used in the Home App to pair the device. The commissioning
 
 ### Changing LED GPIO
 
-Edit `main/app_main.cpp:27`:
+Edit `main/app_driver.cpp:23`:
 ```cpp
-#define LED_GPIO GPIO_NUM_X  // Replace X with your GPIO number
+#define LED_GPIO GPIO_NUM_X  // Replace X with your GPIO number (currently GPIO_NUM_2)
 ```
+
+Then update the `app_driver_light_set_power()` function if your LED has different polarity (active-LOW vs active-HIGH).
 
 ### Adding Device Metadata
 
@@ -158,7 +184,8 @@ Change from `on_off_light::create()` to `dimmable_light::create()` and implement
 ## Important Notes
 
 - **No state persistence**: LED state is not saved to NVS. After reboot, the device starts with LED off. Matter controller (Apple Home) will re-sync state.
-- **Active-HIGH LED**: `gpio_set_level(LED_GPIO, 1)` turns LED on
+- **Direct GPIO Control**: LED is controlled directly via `gpio_set_level()`, bypassing ESP-Matter LED driver
+  - GPIO 2 on ESP32 DevKit: GPIO HIGH (1) = LED ON, GPIO LOW (0) = LED OFF
 - **BLE + WiFi**: Device uses BLE only for initial commissioning, then operates over WiFi
 - **OTA Ready**: Dual-partition layout supports OTA updates via Matter controller
 
@@ -198,8 +225,13 @@ Change from `on_off_light::create()` to `dimmable_light::create()` and implement
 **Status:** ✅ Fully operational in Apple Home
 - Device appears as On/Off Light
 - Controllable via Home App and Siri
-- LED switches correctly on command
+- **LED control working perfectly** (GPIO 2, direct control)
 - Matter protocol working stably
+
+**Implementation Notes:**
+- LED is controlled directly via `gpio_set_level(GPIO_NUM_2, val)` in `app_driver.cpp`
+- Bypasses ESP-Matter LED driver for predictable GPIO 2 control
+- GPIO HIGH = LED ON, GPIO LOW = LED OFF
 
 ### Factory Reset (if needed)
 

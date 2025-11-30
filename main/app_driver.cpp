@@ -9,6 +9,7 @@
 #include <esp_log.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include <esp_matter.h>
 #include <app_priv.h>
@@ -17,6 +18,9 @@
 #include <device.h>
 #include <led_driver.h>
 #include <button_gpio.h>
+#include <driver/gpio.h>
+
+#define LED_GPIO GPIO_NUM_2
 
 using namespace chip::app::Clusters;
 using namespace esp_matter;
@@ -31,7 +35,17 @@ static uint16_t current_y = 0;
 /* Do any conversions/remapping for the actual value here */
 static esp_err_t app_driver_light_set_power(led_driver_handle_t handle, esp_matter_attr_val_t *val)
 {
-    return led_driver_set_power(handle, val->val.b);
+    ESP_LOGI(TAG, ">>> LED Power command: %s (value: %d)", val->val.b ? "ON" : "OFF", val->val.b);
+
+    // Direct GPIO control for GPIO 2
+    // Matter ON (1) → GPIO HIGH (1) → LED ON
+    // Matter OFF (0) → GPIO LOW (0) → LED OFF
+    uint32_t gpio_level = val->val.b ? 1 : 0;
+
+    ESP_LOGI(TAG, ">>> Setting GPIO 2 to: %" PRIu32, gpio_level);
+    gpio_set_level(LED_GPIO, gpio_level);
+
+    return ESP_OK;
 }
 
 static esp_err_t app_driver_light_set_brightness(led_driver_handle_t handle, esp_matter_attr_val_t *val)
